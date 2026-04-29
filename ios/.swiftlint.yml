@@ -1,0 +1,18 @@
+disabled_rules:
+  - trailing_whitespace
+  - line_length
+  - todo
+  - identifier_name
+
+opt_in_rules:
+  - empty_count
+  - explicit_init
+  - first_where
+  - implicit_return
+  - operator_usage_whitespace
+  - redundant_nil_coalescing
+
+excluded:
+  - .build
+  - DerivedData
+  - SkillBridge.xcodeproj
