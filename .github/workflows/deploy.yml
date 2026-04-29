@@ -1,15 +1,14 @@
 name: Deploy to AWS EC2
 
+# Manual trigger only — set EC2_HOST / EC2_USER / EC2_SSH_KEY (and optional EC2_PORT)
+# in repo Settings → Secrets, then run from the Actions tab.
 on:
-  push:
-    branches: [main]
   workflow_dispatch: {}
 
 jobs:
   deploy:
     name: SSH deploy
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
 
     steps:
       - uses: actions/checkout@v4
