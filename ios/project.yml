@@ -1,0 +1,74 @@
+name: SkillBridge
+options:
+  bundleIdPrefix: com.skillbridge
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    DEVELOPMENT_TEAM: ""
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    GENERATE_INFOPLIST_FILE: YES
+    ENABLE_PREVIEWS: YES
+
+targets:
+  SkillBridge:
+    type: application
+    platform: iOS
+    sources:
+      - path: SkillBridge
+    info:
+      path: SkillBridge/Info.plist
+      properties:
+        CFBundleDisplayName: SkillBridge
+        UILaunchScreen: {}
+        API_BASE_URL: "$(API_BASE_URL)"
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.skillbridge.app
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        API_BASE_URL: "http://localhost:4000/api/v1"
+
+  SkillBridgeTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: SkillBridgeTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.skillbridge.app.tests
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    dependencies:
+      - target: SkillBridge
+
+  SkillBridgeUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: SkillBridgeUITests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.skillbridge.app.uitests
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    dependencies:
+      - target: SkillBridge
+
+schemes:
+  SkillBridge:
+    build:
+      targets:
+        SkillBridge: all
+        SkillBridgeTests: [test]
+        SkillBridgeUITests: [test]
+    test:
+      targets:
+        - SkillBridgeTests
+        - SkillBridgeUITests
