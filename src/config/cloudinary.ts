@@ -1,20 +1,47 @@
-import multer from 'multer';
-import { Request } from 'express';
-import { BadRequestError } from '../utils/appError';
+import { v2 as cloudinary, type UploadApiResponse } from 'cloudinary';
+import { env } from './env';
+import { logger } from '../utils/logger';
 
-const storage = multer.memoryStorage();
+let configured = false;
 
-const fileFilter = (_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new BadRequestError('Invalid file type. Only JPEG, PNG, and PDF allowed'));
+const ensureConfigured = (): void => {
+  if (configured) return;
+  if (!env.cloudinary.cloudName) {
+    logger.warn('Cloudinary not configured — uploads will fail');
+    return;
   }
+  cloudinary.config({
+    cloud_name: env.cloudinary.cloudName,
+    api_key: env.cloudinary.apiKey,
+    api_secret: env.cloudinary.apiSecret,
+    secure: true,
+  });
+  configured = true;
 };
 
-export const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter,
-});
+export interface UploadResult {
+  url: string;
+  publicId: string;
+}
+
+export const uploadBufferToCloudinary = (
+  buffer: Buffer,
+  folder: string,
+): Promise<UploadResult> => {
+  ensureConfigured();
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: 'auto' },
+      (err, result: UploadApiResponse | undefined) => {
+        if (err || !result) return reject(err ?? new Error('Upload failed'));
+        resolve({ url: result.secure_url, publicId: result.public_id });
+      },
+    );
+    stream.end(buffer);
+  });
+};
+
+export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
+  ensureConfigured();
+  await cloudinary.uploader.destroy(publicId);
+};

@@ -16,4 +16,5 @@ export const updateWorkerProfileSchema = Joi.object({
 export const addSkillSchema = Joi.object({
   skillName: Joi.string().min(2).max(100).required(),
   yearsExp: Joi.number().integer().min(0).max(50).required(),
+  certificateUrl: Joi.string().uri().optional(),
 });
